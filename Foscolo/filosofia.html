@@ -1,35 +1,711 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Filosofia – Foscolo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Ingranaggi – Drop & Replace (Random)</title>
   <style>
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#fff;}
-    .wrap{padding:18px;}
-    h1{margin:0 0 10px 0;font-size:22px;}
-    .card{border:1px solid #ddd;border-radius:16px;padding:14px;margin:10px 0;}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f2c94c;font-weight:800;}
-    ul{margin:10px 0 0 18px;}
+    :root{
+      --bgA:#ffffff;
+      --bgB:#f4f6ff;
+      --panel: rgba(255,255,255,.70);
+      --stroke: rgba(120,130,160,.18);
+      --text:#141826;
+      --muted:#5b6272;
+      --shadow: 0 18px 60px rgba(12, 18, 38, .16);
+      --shadow2: 0 10px 30px rgba(12, 18, 38, .10);
+      --radius: 22px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background: radial-gradient(1400px 700px at 50% 35%, var(--bgB), var(--bgA));
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .wrap{
+      width:min(1040px, 96vw);
+      height:min(760px, 92vh);
+      position:relative;
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      border:1px solid rgba(190,200,230,.55);
+      background: radial-gradient(1100px 520px at 50% 38%, #ffffff, #f0f2ff);
+      touch-action: none;
+    }
+
+    .hud{
+      position:absolute;
+      left:16px; right:16px; top:16px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      pointer-events:none;
+    }
+    .panel{
+      pointer-events:auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow2);
+    }
+    .title{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .badge{
+      width:12px;height:12px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #7c3aed, #0ea5e9);
+      box-shadow: 0 0 0 4px rgba(14,165,233,.12);
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(160,170,210,.22);
+      background: linear-gradient(#ffffff, #f3f5ff);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:750;
+      font-size:13px;
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+      box-shadow: 0 10px 22px rgba(12,18,38,.08);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:hover{ border-color: rgba(124,58,237,.25); }
+    button:active{ transform: translateY(1px); }
+    button.primary{
+      background: linear-gradient(#f8f9ff, #eef2ff);
+      border-color: rgba(124,58,237,.22);
+    }
+    label{
+      display:flex; gap:8px; align-items:center;
+      font-size:13px; color:var(--muted);
+      user-select:none;
+    }
+    input[type="checkbox"]{
+      width:18px;height:18px;
+      accent-color:#3b82f6;
+      cursor:pointer;
+    }
+    .note{
+      position:absolute;
+      left:18px;
+      bottom:18px;
+      font-size:12px;
+      color:rgba(55,65,81,.78);
+      background: rgba(255,255,255,.62);
+      border:1px solid rgba(160,170,210,.22);
+      padding:8px 10px;
+      border-radius:14px;
+      backdrop-filter: blur(10px);
+      pointer-events:none;
+    }
+    @media (max-width: 520px){
+      .hud{ top:12px; left:12px; right:12px; }
+      .panel{ padding:9px 10px; border-radius:16px; }
+      button{ padding:9px 10px; }
+      .note{ left:12px; right:12px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Foscolo – Filosofia (scheda visuale)</h1>
-    <div class="card"><span class="pill">Asse 1</span> <b>Vero amaro</b>
-      <ul>
-        <li>assenza di certezze metafisiche</li>
-        <li>limite della morte</li>
-      </ul>
+    <canvas id="c"></canvas>
+
+    <div class="hud">
+      <div class="panel title">
+        <span class="badge"></span>
+        <span>Ingranaggi – random drop</span>
+      </div>
+
+      <div class="panel">
+        <button id="toggle" class="primary">⏸ Pausa</button>
+        <button id="swapNow">🔁 Sostituisci</button>
+        <label title="Dopo un po’ un ingranaggio casuale cade e viene sostituito automaticamente">
+          <input id="auto" type="checkbox" checked />
+          Auto
+        </label>
+      </div>
     </div>
-    <div class="card"><span class="pill">Asse 2</span> <b>Illusioni necessarie</b>
-      <ul>
-        <li>affetti, memoria, patria</li>
-        <li>poesia e gloria come continuità</li>
-      </ul>
-    </div>
-    <div class="card"><span class="pill">Tensione</span> vivere reggendo insieme disincanto e bisogno di senso.</div>
-    <p style="opacity:.75">Questa pagina è un placeholder: puoi sostituirla con la tua mappa/immagine o con un layout più ricco.</p>
+
+    <div class="note">Spazio = Play/Pausa · R = Sostituisci · Trascina un ingranaggio per spostarlo</div>
   </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  // Hi-DPI sizing
+  let dpr = 1;
+  let W = 0, H = 0;
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.max(1, Math.min(2.75, window.devicePixelRatio || 1));
+    W = rect.width;
+    H = rect.height;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const lerp = (a,b,t)=>a+(b-a)*t;
+  const easeInOut = (t)=> (t<.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2);
+
+  // Premium palette
+  const PALETTE = [
+    ['#22d3ee','#2563eb'],
+    ['#fb923c','#f97316'],
+    ['#34d399','#16a34a'],
+    ['#f472b6','#a21caf'],
+    ['#a78bfa','#6d28d9'],
+    ['#fb7185','#e11d48'],
+    ['#2dd4bf','#0ea5e9'],
+    ['#fde047','#f59e0b'],
+  ];
+  function pickPalette(except=-1){
+    let i;
+    do{i=Math.floor(Math.random()*PALETTE.length);} while(i===except);
+    return { idx:i, a:PALETTE[i][0], b:PALETTE[i][1] };
+  }
+
+  // Background
+  function drawBackground(){
+    ctx.clearRect(0,0,W,H);
+
+    const g = ctx.createRadialGradient(W*0.5, H*0.40, 20, W*0.5, H*0.45, Math.max(W,H)*0.9);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(1, 'rgba(240,243,255,1)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // diagonal sheen
+    ctx.save();
+    ctx.globalAlpha = 0.05;
+    ctx.translate(W*0.12, H*0.05);
+    ctx.rotate(-Math.PI/18);
+    ctx.fillStyle = '#0f172a';
+    for(let i=0;i<18;i++) ctx.fillRect(-W, i*38, W*3, 10);
+    ctx.restore();
+
+    // vignette
+    const v = ctx.createRadialGradient(W*0.5, H*0.48, Math.min(W,H)*0.18, W*0.5, H*0.52, Math.max(W,H)*0.92);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, 'rgba(12,18,38,0.12)');
+    ctx.fillStyle = v;
+    ctx.fillRect(0,0,W,H);
+
+    // micro-grain (light)
+    ctx.save();
+    ctx.globalAlpha = 0.035;
+    for(let y=0;y<H;y+=2){
+      for(let x=0;x<W;x+=2){
+        const r = Math.random();
+        if(r<0.06){
+          ctx.fillStyle = r<0.03 ? 'rgba(0,0,0,.35)' : 'rgba(255,255,255,.55)';
+          ctx.fillRect(x,y,1,1);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  function floorShadow(cx, cy, rx, ry, a){
+    ctx.save();
+    ctx.globalAlpha = a;
+    const grd = ctx.createRadialGradient(cx, cy, 1, cx, cy, Math.max(rx,ry));
+    grd.addColorStop(0, 'rgba(0,0,0,.20)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGear(g){
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.angle);
+    ctx.globalAlpha = g.alpha;
+
+    const r = g.r;
+    const teeth = g.teeth;
+    const toothDepth = r * 0.13;
+    const ro = r;
+    const rt = r + toothDepth;
+    const rInner = r*0.70;
+    const rHub = r*0.20;
+
+    // shadow
+    ctx.save();
+    ctx.shadowColor = 'rgba(10,14,30,.22)';
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 12;
+
+    // gear path
+    ctx.beginPath();
+    for(let i=0;i<teeth;i++){
+      const a0=(i/teeth)*Math.PI*2;
+      const a1=((i+0.40)/teeth)*Math.PI*2;
+      const a2=((i+0.70)/teeth)*Math.PI*2;
+      const a3=((i+1.00)/teeth)*Math.PI*2;
+      ctx.lineTo(Math.cos(a0)*ro, Math.sin(a0)*ro);
+      ctx.lineTo(Math.cos(a1)*rt, Math.sin(a1)*rt);
+      ctx.lineTo(Math.cos(a2)*rt, Math.sin(a2)*rt);
+      ctx.lineTo(Math.cos(a3)*ro, Math.sin(a3)*ro);
+    }
+    ctx.closePath();
+
+    const grad = ctx.createRadialGradient(0, -r*0.35, r*0.10, 0, 0, rt);
+    grad.addColorStop(0, g.colA);
+    grad.addColorStop(0.60, g.colB);
+    grad.addColorStop(1, '#0b1020');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.restore();
+
+    // edge lights
+    ctx.save();
+    ctx.globalAlpha *= 0.70;
+    ctx.strokeStyle = 'rgba(255,255,255,.42)';
+    ctx.lineWidth = Math.max(1, r*0.06);
+    ctx.beginPath();
+    ctx.arc(0,0, ro*0.98, -Math.PI*0.82, -Math.PI*0.18);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalAlpha *= 0.55;
+    ctx.strokeStyle = 'rgba(0,0,0,.16)';
+    ctx.lineWidth = Math.max(1, r*0.02);
+    ctx.beginPath();
+    ctx.arc(0,0, rt*0.98, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    // cut inner
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(0,0, rInner, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // inner ring
+    ctx.save();
+    const ring = ctx.createRadialGradient(0,-r*0.18, r*0.05, 0,0, rInner*1.02);
+    ring.addColorStop(0, 'rgba(255,255,255,.90)');
+    ring.addColorStop(1, 'rgba(255,255,255,.20)');
+    ctx.fillStyle = ring;
+    ctx.beginPath();
+    ctx.arc(0,0, rInner, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha *= 0.65;
+    ctx.strokeStyle = 'rgba(0,0,0,.10)';
+    ctx.lineWidth = Math.max(1, r*0.02);
+    ctx.beginPath();
+    ctx.arc(0,0, rInner*0.98, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    // hub
+    ctx.save();
+    const hub = ctx.createRadialGradient(0,-rHub*0.8, rHub*0.12, 0,0, rHub);
+    hub.addColorStop(0, 'rgba(255,255,255,.98)');
+    hub.addColorStop(1, 'rgba(255,255,255,.45)');
+    ctx.fillStyle = hub;
+    ctx.beginPath();
+    ctx.arc(0,0, rHub, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(0,0,0,.14)';
+    ctx.beginPath();
+    ctx.arc(0,0, rHub*0.36, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha *= 0.75;
+    ctx.strokeStyle = 'rgba(255,255,255,.65)';
+    ctx.lineWidth = Math.max(1, rHub*0.18);
+    ctx.beginPath();
+    ctx.arc(0,0, rHub*0.72, -Math.PI*0.90, -Math.PI*0.40);
+    ctx.stroke();
+    ctx.restore();
+
+    // spokes
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,.10)';
+    ctx.lineWidth = Math.max(1, r*0.030);
+    ctx.lineCap = 'round';
+    for(let i=0;i<g.spokes;i++){
+      const a = (i/g.spokes)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*rHub*0.92, Math.sin(a)*rHub*0.92);
+      ctx.lineTo(Math.cos(a)*rInner*0.93, Math.sin(a)*rInner*0.93);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // specular sweep
+    ctx.save();
+    ctx.globalAlpha *= 0.22;
+    const sweep = ctx.createLinearGradient(-rt, -rt, rt, rt);
+    sweep.addColorStop(0, 'rgba(255,255,255,0)');
+    sweep.addColorStop(0.45, 'rgba(255,255,255,.08)');
+    sweep.addColorStop(0.55, 'rgba(255,255,255,.28)');
+    sweep.addColorStop(0.65, 'rgba(255,255,255,.08)');
+    sweep.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sweep;
+    ctx.beginPath();
+    ctx.arc(0,0, rt*0.98, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  class Gear {
+    constructor(opts){
+      Object.assign(this, opts);
+      this.angle = opts.angle || 0;
+      this.omega = opts.omega || 0;
+      this.alpha = 1;
+      this.state = 'engaged'; // engaged | falling
+      this.vy = 0;
+      this.slotX = this.x;
+      this.slotY = this.y;
+      this.incoming = null;
+      this.dropT = 0;
+    }
+  }
+
+  const gears = [];
+  let lastDropped = -1; // evita ripetizione immediata
+
+  function rebuildLayout(){
+    gears.length = 0;
+    const scale = Math.min(W,H)/760;
+    const cx = W*0.52;
+    const cy = H*0.52;
+
+    const P = [
+      [-190, -140],
+      [ -40, -155],
+      [ 125, -130],
+      [ 210,  -20],
+      [  10,   10],
+      [-170,   55],
+      [ 125,  140],
+    ];
+
+    const S = [98, 72, 92, 60, 82, 66, 104].map(v=>v*scale);
+
+    let lastPal = -1;
+    for(let i=0;i<S.length;i++){
+      const pal = pickPalette(lastPal);
+      lastPal = pal.idx;
+
+      const r = S[i];
+      const teeth = Math.round(clamp(r/6.2, 11, 20));
+      const spokes = Math.round(clamp(r/22, 3, 6));
+
+      gears.push(new Gear({
+        id:i,
+        x: cx + P[i][0]*scale,
+        y: cy + P[i][1]*scale,
+        r,
+        teeth,
+        spokes,
+        colA: pal.a,
+        colB: pal.b,
+        omega: 0,
+      }));
+    }
+
+    // coherent angular velocities (mesh-ish)
+    const links = [[0,1],[1,2],[2,3],[1,4],[0,5],[4,6],[5,4]];
+    gears[0].omega = 0.95;
+    const visited = new Set([0]);
+    let progress = true;
+    while(progress){
+      progress = false;
+      for(const [a,b] of links){
+        const ga = gears[a], gb = gears[b];
+        if(visited.has(a) && !visited.has(b)){
+          gb.omega = -ga.omega * (ga.r/gb.r);
+          visited.add(b);
+          progress = true;
+        } else if(visited.has(b) && !visited.has(a)){
+          ga.omega = -gb.omega * (gb.r/ga.r);
+          visited.add(a);
+          progress = true;
+        }
+      }
+    }
+  }
+
+  // Drop & Replace (random)
+  let autoEnabled = true;
+  let playing = true;
+  let nextAutoSwapAt = 0;
+
+  function scheduleNextSwap(now){
+    nextAutoSwapAt = now + (5200 + Math.random()*3300);
+  }
+
+  function pickRandomTarget(){
+    const candidates = gears
+      .map((g,i)=>({g,i}))
+      .filter(o => o.g.state === 'engaged');
+
+    if(candidates.length === 0) return -1;
+
+    // evita ripetizione immediata se possibile
+    let tries = 0;
+    while(tries < 8){
+      const pick = candidates[Math.floor(Math.random()*candidates.length)];
+      if(pick.i !== lastDropped || candidates.length === 1) return pick.i;
+      tries++;
+    }
+    return candidates[Math.floor(Math.random()*candidates.length)].i;
+  }
+
+  function startDrop(){
+    const idx = pickRandomTarget();
+    if(idx < 0) return;
+
+    lastDropped = idx;
+    const g = gears[idx];
+
+    g.state = 'falling';
+    g.vy = 0;
+    g.dropT = 0;
+
+    const oldPal = PALETTE.findIndex(pp => pp[0]===g.colA && pp[1]===g.colB);
+    const pal = pickPalette(oldPal);
+
+    const scale = 0.92 + Math.random()*0.22;
+    const incoming = new Gear({
+      id: g.id,
+      x: g.slotX,
+      y: g.slotY - Math.min(H*0.9, 560),
+      r: g.r * scale,
+      teeth: Math.round(clamp((g.r*scale)/6.2, 11, 22)),
+      spokes: g.spokes,
+      colA: pal.a,
+      colB: pal.b,
+      omega: g.omega,
+    });
+    incoming.alpha = 0;
+    incoming.state = 'incoming';
+    incoming.fromY = incoming.y;
+    incoming.t = 0;
+    incoming.slotX = g.slotX;
+    incoming.slotY = g.slotY;
+
+    g.incoming = incoming;
+  }
+
+  // Drag interaction
+  let drag = { active:false, idx:-1, ox:0, oy:0 };
+  function hitTest(x,y){
+    for(let i=gears.length-1;i>=0;i--){
+      const g = gears[i];
+      if(g.state !== 'engaged') continue;
+      const dx = x-g.x, dy = y-g.y;
+      if(Math.hypot(dx,dy) <= g.r*1.08) return i;
+    }
+    return -1;
+  }
+  function pointerPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+  canvas.addEventListener('pointerdown', (e)=>{
+    const {x,y} = pointerPos(e);
+    const idx = hitTest(x,y);
+    if(idx>=0){
+      drag.active = true;
+      drag.idx = idx;
+      drag.ox = gears[idx].x - x;
+      drag.oy = gears[idx].y - y;
+      canvas.setPointerCapture(e.pointerId);
+    }
+  });
+  canvas.addEventListener('pointermove', (e)=>{
+    if(!drag.active) return;
+    const {x,y} = pointerPos(e);
+    const g = gears[drag.idx];
+    g.x = x + drag.ox;
+    g.y = y + drag.oy;
+    g.slotX = g.x;
+    g.slotY = g.y;
+  });
+  canvas.addEventListener('pointerup', ()=>{ drag.active=false; drag.idx=-1; });
+  canvas.addEventListener('pointercancel', ()=>{ drag.active=false; drag.idx=-1; });
+
+  function render(){
+    drawBackground();
+
+    floorShadow(W*0.52, H*0.80, Math.min(W,600)*0.34, Math.min(H,520)*0.085, 0.35);
+
+    for(const g of gears){
+      if(g.state === 'engaged') drawGear(g);
+    }
+
+    for(const g of gears){
+      if(g.state === 'falling'){
+        const f = clamp((g.y - g.slotY) / (H*0.65), 0, 1);
+        floorShadow(g.slotX, g.slotY + 170, g.r*(0.95 - f*0.45), g.r*(0.24 - f*0.10), 0.20*(1-f));
+        drawGear(g);
+        if(g.incoming) drawGear(g.incoming);
+      }
+    }
+
+    ctx.save();
+    const b = ctx.createLinearGradient(0, H*0.86, 0, H);
+    b.addColorStop(0, 'rgba(0,0,0,0)');
+    b.addColorStop(1, 'rgba(0,0,0,.06)');
+    ctx.fillStyle = b;
+    ctx.fillRect(0, H*0.86, W, H*0.14);
+    ctx.restore();
+  }
+
+  let last = performance.now();
+  function tick(now){
+    const dt = Math.min(0.033, (now-last)/1000);
+    last = now;
+
+    if(playing){
+      for(const g of gears){
+        if(g.state === 'engaged' || g.state === 'falling' || g.state === 'incoming'){
+          const dragSlow = (drag.active && gears[drag.idx]===g) ? 0.25 : 1;
+          g.angle += g.omega * dt * dragSlow;
+        }
+      }
+
+      for(const g of gears){
+        if(g.state === 'falling'){
+          g.dropT += dt;
+          g.vy += 1300 * dt;
+          g.y  += g.vy * dt;
+
+          const fade = clamp(1 - (g.y - g.slotY)/(H*0.70), 0, 1);
+          g.alpha = fade;
+
+          if(g.incoming){
+            const inc = g.incoming;
+            inc.t += dt;
+            const t = clamp(inc.t/1.15, 0, 1);
+            const e = easeInOut(t);
+            inc.y = lerp(inc.fromY, inc.slotY, e);
+            inc.alpha = clamp(t*1.25, 0, 1);
+
+            if(t>=1 && g.y > H + g.r*2){
+              const keepOmega = g.omega;
+              const keepAngle = g.angle;
+
+              g.x = inc.slotX;
+              g.y = inc.slotY;
+              g.slotX = g.x;
+              g.slotY = g.y;
+              g.r = inc.r;
+              g.teeth = inc.teeth;
+              g.spokes = inc.spokes;
+              g.colA = inc.colA;
+              g.colB = inc.colB;
+              g.omega = keepOmega;
+              g.angle = keepAngle;
+              g.alpha = 1;
+              g.vy = 0;
+
+              g.state = 'engaged';
+              g.incoming = null;
+            }
+          }
+        }
+      }
+
+      if(autoEnabled && now >= nextAutoSwapAt){
+        startDrop();
+        scheduleNextSwap(now);
+      }
+    }
+
+    render();
+    requestAnimationFrame(tick);
+  }
+
+  // Controls
+  const btnToggle = document.getElementById('toggle');
+  const btnSwap = document.getElementById('swapNow');
+  const chkAuto = document.getElementById('auto');
+
+  btnToggle.addEventListener('click', ()=>{
+    playing = !playing;
+    btnToggle.textContent = playing ? '⏸ Pausa' : '▶️ Play';
+    if(playing) scheduleNextSwap(performance.now());
+  });
+
+  btnSwap.addEventListener('click', ()=>{
+    startDrop();
+    scheduleNextSwap(performance.now());
+  });
+
+  chkAuto.addEventListener('change', ()=>{
+    autoEnabled = chkAuto.checked;
+    if(autoEnabled) scheduleNextSwap(performance.now());
+  });
+
+  window.addEventListener('keydown', (e)=>{
+    if(e.code === 'Space'){
+      e.preventDefault();
+      btnToggle.click();
+    }
+    if(e.key.toLowerCase() === 'r'){
+      btnSwap.click();
+    }
+  });
+
+  // Init
+  resize();
+  rebuildLayout();
+  scheduleNextSwap(performance.now());
+  requestAnimationFrame(tick);
+
+  // Debounced rebuild on resize
+  let tmr=null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(tmr);
+    tmr=setTimeout(()=>{ resize(); rebuildLayout(); }, 120);
+  }, { passive:true });
+
+})();
+</script>
 </body>
 </html>
