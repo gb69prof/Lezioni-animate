@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Foscolo – L’immagine del mondo</title>
+  <style>
+    :root{
+      --gold:#f2c94c;
+      --ink:#111;
+      --glass: rgba(255,255,255,.92);
+      --glass2: rgba(0,0,0,.70);
+      --radius:18px;
+      --gap:12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:url('assets/sfondo.jpg') center/cover fixed;
+      color:var(--ink);
+    }
+    .app{
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px;
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:var(--gap);
+    }
+
+    /* HEADER (1,2,2bis,3) */
+    .top{
+      display:grid;
+      grid-template-columns:90px 1fr 260px 220px;
+      gap:var(--gap);
+      align-items:stretch;
+    }
+    .tile{
+      background:var(--glass);
+      border:1px solid rgba(0,0,0,.14);
+      border-radius:var(--radius);
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .tile.dark{
+      background:var(--glass2);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .homebtn{
+      display:flex;align-items:center;justify-content:center;height:100%;
+    }
+    .homebtn a{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+    .homebtn img{width:42px;height:42px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}
+    .title{
+      padding:14px 16px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:1000;
+      letter-spacing:.8px;
+      font-size:26px;
+      color:var(--gold);
+      text-shadow:0 2px 0 rgba(0,0,0,.35);
+    }
+    .subtitle{
+      padding:14px 14px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;
+      font-size:16px;
+      color:var(--gold);
+    }
+    .dropdown{
+      padding:12px 14px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:8px;
+    }
+    .dropdown label{font-size:12px;opacity:.9;color:#fff}
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      font-weight:800;
+      outline:none;
+      appearance:none;
+    }
+    option{color:#111}
+    .rule{
+      grid-column:1 / -1;
+      height:3px;
+      background:linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius:999px;
+      margin-top:10px;
+      opacity:.95;
+    }
+
+    /* MAIN (4,5,6,7) */
+    .main{
+      display:grid;
+      grid-template-columns: 1.25fr .85fr;
+      gap:var(--gap);
+      align-items:stretch;
+    }
+    .left{
+      display:grid;
+      grid-template-rows: 1.05fr .55fr;
+      gap:var(--gap);
+      min-height:0;
+    }
+    .right{
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap:var(--gap);
+      min-height:0;
+    }
+
+    .frame{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      border-radius:var(--radius);
+    }
+    .framewrap{
+      padding:0;
+      min-height:0;
+    }
+    .imgwrap{
+      padding:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .imgwrap img{
+      width:100%;
+      max-height:340px;
+      object-fit:cover;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.15);
+    }
+
+    .textwrap{
+      padding:14px 16px;
+      min-height:0;
+      overflow:auto;
+      line-height:1.45;
+      font-size:15px;
+    }
+    .textwrap h3{margin:0 0 10px 0}
+    .note{opacity:.75;font-size:12px;margin-top:10px}
+
+    /* BOTTOM (8,9) */
+    .bottom{
+      display:grid;
+      grid-template-columns: 110px 1fr 110px;
+      gap:var(--gap);
+      align-items:center;
+    }
+    .iconbtn{
+      display:flex;align-items:center;justify-content:center;
+      padding:10px;
+    }
+    .iconbtn a{
+      width:100%;
+      height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:var(--radius);
+      background:var(--glass);
+      border:1px solid rgba(0,0,0,.14);
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
+      text-decoration:none;
+    }
+    .iconbtn img{width:44px;height:44px}
+    .centerhint{
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      border-radius:var(--radius);
+      padding:10px 12px;
+      font-size:12px;
+      text-align:center;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .top{grid-template-columns:70px 1fr 1fr; grid-template-rows:auto auto; }
+      .subtitle{grid-column:2 / 4;}
+      .dropdown{grid-column:1 / 4;}
+      .main{grid-template-columns:1fr; }
+      .right{grid-template-rows:auto 260px;}
+      .imgwrap img{max-height:280px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="top">
+      <!-- 1: Home icon -->
+      <div class="tile dark homebtn" title="Home">
+        <a href="Foscolo.html" aria-label="Home Foscolo">
+          <img src="assets/home.svg" alt="Home">
+        </a>
+      </div>
+
+      <!-- 2: Title -->
+      <div class="tile dark title">UGO FOSCOLO</div>
+
+      <!-- 2-bis: Subtitle -->
+      <div class="tile dark subtitle">l’immagine del mondo</div>
+
+      <!-- 3: Dropdown index -->
+      <div class="tile dark dropdown">
+        <label for="indice">Indice</label>
+        <select id="indice">
+          <option value="" selected>Vai a…</option>
+          <option value="immagine-del-mondo.html">immagine del mondo</option>
+          <option value="poetica.html">poetica</option>
+          <option value="neoclassicismo.html">neoclassicismo</option>
+          <option value="preromanticismo.html">preromanticismo</option>
+          <option value="opere.html">le opere e i testi</option>
+        </select>
+      </div>
+
+      <div class="rule" aria-hidden="true"></div>
+    </div>
+
+    <div class="main">
+      <!-- LEFT: 4 + 7 -->
+      <div class="left">
+        <!-- 4: filosofia.html full inside -->
+        <div class="tile framewrap" title="4 – filosofia.html dentro il riquadro">
+          <iframe class="frame" src="filosofia.html"></iframe>
+        </div>
+
+        <!-- 7: filosofia-test.html inside -->
+        <div class="tile framewrap" title="7 – test/filosofia-test.html">
+          <iframe class="frame" src="test/filosofia-test.html"></iframe>
+        </div>
+      </div>
+
+      <!-- RIGHT: 5 + 6 -->
+      <div class="right">
+        <!-- 5: Foscolo photo -->
+        <div class="tile imgwrap" title="5 – Foto di Foscolo">
+          <img src="assets/foscolo.jpg" alt="Ugo Foscolo">
+        </div>
+
+        <!-- 6: filosofia.txt -->
+        <div class="tile textwrap" id="txtBox" title="6 – txt/filosofia.txt">
+          <h3>Filosofia (testo)</h3>
+          <div id="txtContent">Caricamento…</div>
+          <div class="note">File: <b>txt/filosofia.txt</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <!-- 8: back to previous web app page -->
+      <div class="iconbtn">
+        <a href="Foscolo.html" title="Torna alla web app precedente">
+          <img src="assets/back.svg" alt="Indietro">
+        </a>
+      </div>
+
+      <div class="centerhint">
+        Suggerimento: puoi sostituire <b>assets/foscolo.jpg</b> con la tua foto reale (stesso nome) senza toccare il codice.
+      </div>
+
+      <!-- 9: go to poetica.html -->
+      <div class="iconbtn">
+        <a href="poetica.html" title="Vai a Poetica">
+          <img src="assets/next.svg" alt="Avanti">
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Dropdown navigation
+    const sel = document.getElementById('indice');
+    sel.addEventListener('change', () => {
+      if (sel.value) window.location.href = sel.value;
+    });
+
+    // Load filosofia.txt into box 6
+    fetch('txt/filosofia.txt')
+      .then(r => r.text())
+      .then(t => {
+        // Preserve line breaks
+        document.getElementById('txtContent').innerHTML =
+          '<pre style="margin:0;white-space:pre-wrap;font-family:inherit">' +
+          t.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])) +
+          '</pre>';
+      })
+      .catch(() => {
+        document.getElementById('txtContent').textContent = 'Impossibile caricare il file txt/filosofia.txt';
+      });
+  </script>
+</body>
+</html>
