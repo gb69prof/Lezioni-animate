@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Test – Filosofia (Foscolo)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:16px;background:#fff;}
+    h1{margin:0 0 10px 0;font-size:20px;}
+    .q{margin:12px 0;padding:12px;border:1px solid #ddd;border-radius:12px;}
+    button{padding:10px 12px;border:0;border-radius:10px;background:#f2c94c;cursor:pointer;font-weight:700;}
+    .ok{color:#1a7f37;font-weight:700;}
+    .ko{color:#b42318;font-weight:700;}
+  </style>
+</head>
+<body>
+  <h1>Mini test – Filosofia di Foscolo</h1>
+
+  <div class="q">
+    <div>1) Per Foscolo le “illusioni” sono:</div>
+    <label><input type="radio" name="q1" value="a"> una superstizione inutile</label><br/>
+    <label><input type="radio" name="q1" value="b"> un’energia che sostiene la vita e la civiltà</label><br/>
+    <label><input type="radio" name="q1" value="c"> un problema solo scientifico</label>
+    <div id="r1"></div>
+  </div>
+
+  <div class="q">
+    <div>2) Qual è il limite assoluto nella visione foscoliana?</div>
+    <label><input type="radio" name="q2" value="a"> la povertà</label><br/>
+    <label><input type="radio" name="q2" value="b"> la morte</label><br/>
+    <label><input type="radio" name="q2" value="c"> la patria</label>
+    <div id="r2"></div>
+  </div>
+
+  <button id="btn">Correggi</button>
+
+  <script>
+    const answers = { q1: "b", q2: "b" };
+    document.getElementById('btn').addEventListener('click', () => {
+      for (const q of Object.keys(answers)) {
+        const checked = document.querySelector(`input[name="${q}"]:checked`);
+        const out = document.getElementById('r' + q.slice(1));
+        if (!checked) { out.textContent = "Seleziona una risposta."; out.className = "ko"; continue; }
+        if (checked.value === answers[q]) { out.textContent = "Corretto."; out.className = "ok"; }
+        else { out.textContent = "Non corretto."; out.className = "ko"; }
+      }
+    });
+  </script>
+</body>
+</html>
